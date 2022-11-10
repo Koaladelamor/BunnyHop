@@ -20,7 +20,7 @@ public class Manager_Input : MonoBehaviour
     {
         if (_INPUT_MANAGER != null && _INPUT_MANAGER != this)
         {
-            Destroy(this);
+            Destroy(this.gameObject);
         }
         else 
         {

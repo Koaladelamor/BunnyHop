@@ -132,6 +132,10 @@ public class PlayerMovementCC : MonoBehaviour
             }
             //Debug.DrawLine(playerFeet + new Vector3(0.2f, 0, 0), playerFeet + new Vector3(0.2f, offsetY, 0));
             //Debug.DrawLine(playerFeet + new Vector3(-0.2f, 0, 0), playerFeet + new Vector3(-0.2f, offsetY, 0));
+
+            // XZ movement
+            finalVelocity.x = desiredMovement.x * m_AirSettings.CurrentSpeed;
+            finalVelocity.z = desiredMovement.z * m_AirSettings.CurrentSpeed;
         }
 
         // Physically move player
