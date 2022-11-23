@@ -134,10 +134,7 @@ GameObject:
   - component: {fileID: 287623912}
   - component: {fileID: 287623911}
   - component: {fileID: 287623910}
-  - component: {fileID: 287623913}
   - component: {fileID: 287623915}
-  - component: {fileID: 287623916}
-  - component: {fileID: 287623917}
   - component: {fileID: 287623914}
   m_Layer: 0
   m_Name: Player
@@ -211,25 +208,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &287623913
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 287623908}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8812eb9704df2d74bb96d4a6f3e3b29b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerCam: {fileID: 963194227}
-  maxSpeed: 10
-  currentSpeed: 12
-  acceleration: 2
-  desiredRotationSpeed: 0.1
-  jumpForce: 50
-  jump: 0
 --- !u!143 &287623914
 CharacterController:
   m_ObjectHideFlags: 0
@@ -262,159 +240,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCam: {fileID: 963194227}
   gravity: 32
-  friction: 0
-  jumpForce: 14
+  friction: 2
   m_GroundSettings:
     MaxSpeed: 7
     CurrentSpeed: 0
     Acceleration: 14
-    Deceleration: 10
+    Deceleration: 18
   m_AirSettings:
-    MaxSpeed: 7
+    MaxSpeed: 9
     CurrentSpeed: 0
-    Acceleration: 2
-    Deceleration: 2
+    Acceleration: 8
+    Deceleration: 5
   m_StrafeSettings:
     MaxSpeed: 1
     CurrentSpeed: 0
     Acceleration: 50
     Deceleration: 50
-  offsetY: -0.4
---- !u!114 &287623916
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 287623908}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5ed612a71cad2a48a1d3a6431df9969, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerView: {fileID: 963194228}
-  playerViewYOffset: 0.6
-  xMouseSensitivity: 30
-  yMouseSensitivity: 30
-  gravity: 20
-  friction: 6
-  moveSpeed: 7
-  runAcceleration: 14
-  runDeacceleration: 10
-  airAcceleration: 2
-  airDecceleration: 2
-  airControl: 0.3
-  sideStrafeAcceleration: 50
-  sideStrafeSpeed: 1
-  jumpSpeed: 8
-  holdJumpToBhop: 0
-  style:
-    m_Name: 
-    m_Normal:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Hover:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Active:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Focused:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnNormal:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnHover:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnActive:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_OnFocused:
-      m_Background: {fileID: 0}
-      m_ScaledBackgrounds: []
-      m_TextColor: {r: 0, g: 0, b: 0, a: 1}
-    m_Border:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Margin:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Padding:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Overflow:
-      m_Left: 0
-      m_Right: 0
-      m_Top: 0
-      m_Bottom: 0
-    m_Font: {fileID: 0}
-    m_FontSize: 0
-    m_FontStyle: 0
-    m_Alignment: 0
-    m_WordWrap: 0
-    m_RichText: 1
-    m_TextClipping: 0
-    m_ImagePosition: 0
-    m_ContentOffset: {x: 0, y: 0}
-    m_FixedWidth: 0
-    m_FixedHeight: 0
-    m_StretchWidth: 1
-    m_StretchHeight: 0
-  fpsDisplayRate: 4
---- !u!114 &287623917
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 287623908}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2dcab64610507a641853e81bb5647ba4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Camera: {fileID: 963194227}
-  m_MouseLook:
-    m_XSensitivity: 2
-    m_YSensitivity: 2
-    m_ClampVerticalRotation: 1
-    m_MinimumX: -90
-    m_MaximumX: 90
-    m_Smooth: 0
-    m_SmoothTime: 5
-    m_LockCursor: 1
-  m_Friction: 6
-  m_Gravity: 20
-  m_JumpForce: 8
-  m_AutoBunnyHop: 0
-  m_AirControl: 0.3
-  m_GroundSettings:
-    MaxSpeed: 7
-    Acceleration: 14
-    Deceleration: 10
-  m_AirSettings:
-    MaxSpeed: 7
-    Acceleration: 2
-    Deceleration: 2
-  m_StrafeSettings:
-    MaxSpeed: 1
-    Acceleration: 50
-    Deceleration: 50
+  jumpForce: 11
+  validateJump_offsetY: 0
 --- !u!1 &612569326
 GameObject:
   m_ObjectHideFlags: 0
