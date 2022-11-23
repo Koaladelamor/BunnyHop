@@ -20,7 +20,7 @@ namespace Q3Movement
 
         private Quaternion m_CharacterTargetRot;
         private Quaternion m_CameraTargetRot;
-        private bool m_cursorIsLocked = true;
+        //private bool m_cursorIsLocked = true;
 
         public void Init(Transform character, Transform camera)
         {

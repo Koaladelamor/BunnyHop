@@ -42,7 +42,7 @@ public class PlayerMovementCC : MonoBehaviour
     [SerializeField] private float friction;
     
     [SerializeField] private MovementSettings m_GroundSettings = new MovementSettings(7, 14, 18);
-    [SerializeField] private MovementSettings m_AirSettings = new MovementSettings(9, 8, 5);
+    [SerializeField] private MovementSettings m_AirSettings = new MovementSettings(7, 8, 5);
     [SerializeField] private MovementSettings m_StrafeSettings = new MovementSettings(1, 50, 50);
 
     [Header("Jump")]
@@ -132,6 +132,30 @@ public class PlayerMovementCC : MonoBehaviour
                 m_AirSettings.CurrentSpeed = m_AirSettings.MaxSpeed;
             }
 
+            if (desiredMovement.x != 0) // If there's x input movement
+            {
+                // Record last direction while input != 0
+                lastDirectionRecorded.x = desiredMovement.x;
+
+                // X movement
+                finalVelocity.x = desiredMovement.x * m_AirSettings.CurrentSpeed;
+            }
+            if (desiredMovement.z != 0) // If there's z input movement
+            {
+                // Record last direction while input != 0
+                lastDirectionRecorded.z = desiredMovement.z;
+
+                // Z movement
+                finalVelocity.z = desiredMovement.z * m_AirSettings.CurrentSpeed;
+            }
+            else if (desiredMovement.x == 0 && desiredMovement.z == 0 && m_AirSettings.CurrentSpeed > 0)  // If not input movement
+            {
+
+                // XZ movement with last direction
+                finalVelocity.x = lastDirectionRecorded.x * m_AirSettings.CurrentSpeed;
+                finalVelocity.z = lastDirectionRecorded.z * m_AirSettings.CurrentSpeed;
+            }
+
             // Gravity
             finalVelocity.y += desiredMovement.y * gravity * Time.deltaTime;
 
@@ -151,8 +175,8 @@ public class PlayerMovementCC : MonoBehaviour
             //Debug.DrawLine(playerFeet + new Vector3(-0.2f, 0, 0), playerFeet + new Vector3(-0.2f, offsetY, 0));
 
             // XZ movement
-            finalVelocity.x = desiredMovement.x * m_AirSettings.CurrentSpeed;
-            finalVelocity.z = desiredMovement.z * m_AirSettings.CurrentSpeed;
+           // finalVelocity.x = desiredMovement.x * m_AirSettings.CurrentSpeed;
+           // finalVelocity.z = desiredMovement.z * m_AirSettings.CurrentSpeed;
         }
 
 
@@ -169,7 +193,7 @@ public class PlayerMovementCC : MonoBehaviour
 
     private void OnGUI()
     {
-        GUI.TextArea(new Rect(600, 10, 120, 20), "Speed XZ  " + new Vector3(finalVelocity.x, 0, finalVelocity.z).sqrMagnitude.ToString());
+        GUI.TextArea(new Rect(600, 10, 130, 20), "Speed XZ  " + new Vector3(finalVelocity.x, 0, finalVelocity.z).sqrMagnitude.ToString());
     }
     
 }

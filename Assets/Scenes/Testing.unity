@@ -247,7 +247,7 @@ MonoBehaviour:
     Acceleration: 14
     Deceleration: 18
   m_AirSettings:
-    MaxSpeed: 9
+    MaxSpeed: 7
     CurrentSpeed: 0
     Acceleration: 8
     Deceleration: 5
