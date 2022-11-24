@@ -16,6 +16,8 @@ public class CharacterCamera : MonoBehaviour
     [SerializeField] private float sensX;
     [SerializeField] private float sensY;
 
+    [SerializeField] private float cameraLerp;
+
     private Vector2 rightAxisInput;
 
 
@@ -47,8 +49,11 @@ public class CharacterCamera : MonoBehaviour
         rotationX = Mathf.Clamp(rotationX, -85f, 85f);
 
 
-        transform.rotation = Quaternion.Euler(rotationX, rotationY, 0);
+        //transform.rotation = Quaternion.Euler(rotationX, rotationY, 0);
+        transform.eulerAngles = new Vector3(rotationX, rotationY, 0);
         player.rotation = Quaternion.Euler(0, rotationY, 0);
+
+        //player.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, rotationY, 0), cameraLerp * Time.deltaTime);
 
     }
 

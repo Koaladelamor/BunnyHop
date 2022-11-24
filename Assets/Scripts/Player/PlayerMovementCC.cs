@@ -15,7 +15,7 @@ public class PlayerMovementCC : MonoBehaviour
     
 
     [System.Serializable]
-    public class MovementSettings
+    private class MovementSettings
     {
         public float MaxSpeed;
         public float CurrentSpeed;
@@ -60,11 +60,17 @@ public class PlayerMovementCC : MonoBehaviour
     void Update()
     {
         // Get input
-        Vector3 inputMovement = new Vector3(Manager_Input._INPUT_MANAGER.GetLeftAxis().x, 0, Manager_Input._INPUT_MANAGER.GetLeftAxis().y);
-        inputMovement.Normalize();
+        //Vector3 inputMovement = new Vector3(Manager_Input._INPUT_MANAGER.GetLeftAxis().x, 0, Manager_Input._INPUT_MANAGER.GetLeftAxis().y);
+        //inputMovement.Normalize();
 
-        Vector3 desiredMovement = inputMovement.z * playerCam.transform.forward + inputMovement.x * playerCam.transform.right;
-        Vector3 orientation = Quaternion.Euler(0f, playerCam.transform.eulerAngles.y, 0f) * new Vector3(desiredMovement.x, 0f, desiredMovement.z);
+
+        //Vector3 desiredMovement = inputMovement.z * playerCam.transform.forward + inputMovement.x * playerCam.transform.right;
+        Vector3 desiredMovement = Quaternion.Euler(0f, playerCam.transform.eulerAngles.y, 0f) * new Vector3(Manager_Input._INPUT_MANAGER.GetLeftAxis().x, 0, Manager_Input._INPUT_MANAGER.GetLeftAxis().y);
+        desiredMovement.Normalize();
+
+        
+        
+        //Vector3 orientation = Quaternion.Euler(0f, playerCam.transform.eulerAngles.y, 0f) * new Vector3(desiredMovement.x, 0f, desiredMovement.z);
         //Debug.Log("Direction: " + directionCameraRelative.x + "  " + directionCameraRelative.z);
         //Debug.Log("Input: " + inputMovement.x + "  " + inputMovement.y + "  " + inputMovement.z);
 
@@ -73,7 +79,6 @@ public class PlayerMovementCC : MonoBehaviour
 
         if (player.isGrounded)
         {
-
             // Jump
             if (Manager_Input._INPUT_MANAGER.GetJumpButtonDown() || validJump)
             {
@@ -117,7 +122,6 @@ public class PlayerMovementCC : MonoBehaviour
                     finalVelocity.x = lastDirectionRecorded.x * m_GroundSettings.CurrentSpeed;
                     finalVelocity.z = lastDirectionRecorded.z * m_GroundSettings.CurrentSpeed;
                 }
-
             }
         }
         else
@@ -132,13 +136,28 @@ public class PlayerMovementCC : MonoBehaviour
                 m_AirSettings.CurrentSpeed = m_AirSettings.MaxSpeed;
             }
 
-            if (desiredMovement.x != 0) // If there's x input movement
+            else if (desiredMovement.x == 0 && desiredMovement.z == 0 && m_AirSettings.CurrentSpeed > 0)  // If not input movement
+            {
+                // Friction
+                m_AirSettings.CurrentSpeed -= m_AirSettings.Deceleration * Time.deltaTime;
+
+                // XZ movement
+                finalVelocity.x = lastDirectionRecorded.x * m_AirSettings.CurrentSpeed;
+                finalVelocity.z = lastDirectionRecorded.z * m_AirSettings.CurrentSpeed;
+            }
+
+
+            /*if (desiredMovement.x != 0) // If there's x input movement
             {
                 // Record last direction while input != 0
                 lastDirectionRecorded.x = desiredMovement.x;
 
                 // X movement
                 finalVelocity.x = desiredMovement.x * m_AirSettings.CurrentSpeed;
+            }
+            else {
+                // X movement with last direction
+                finalVelocity.x = lastDirectionRecorded.x * m_AirSettings.CurrentSpeed;
             }
             if (desiredMovement.z != 0) // If there's z input movement
             {
@@ -148,13 +167,10 @@ public class PlayerMovementCC : MonoBehaviour
                 // Z movement
                 finalVelocity.z = desiredMovement.z * m_AirSettings.CurrentSpeed;
             }
-            else if (desiredMovement.x == 0 && desiredMovement.z == 0 && m_AirSettings.CurrentSpeed > 0)  // If not input movement
-            {
-
-                // XZ movement with last direction
-                finalVelocity.x = lastDirectionRecorded.x * m_AirSettings.CurrentSpeed;
+            else {
+                // Z movement with last direction
                 finalVelocity.z = lastDirectionRecorded.z * m_AirSettings.CurrentSpeed;
-            }
+            }*/
 
             // Gravity
             finalVelocity.y += desiredMovement.y * gravity * Time.deltaTime;
@@ -179,11 +195,9 @@ public class PlayerMovementCC : MonoBehaviour
            // finalVelocity.z = desiredMovement.z * m_AirSettings.CurrentSpeed;
         }
 
-
         // Physically move and rotate player
         player.Move(finalVelocity * Time.deltaTime);
         //transform.rotation = Quaternion.Euler(orientation * Time.deltaTime);
-
 
 
         //Debug.Log("vel z: " + finalVelocity.z + " vel x: " + finalVelocity.x);

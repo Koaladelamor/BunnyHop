@@ -11,21 +11,47 @@ using Debug = UnityEngine.Debug;
 public class PlayerMovementRB : MonoBehaviour
 {
 
-    [Space]
-    
-    private Vector3 direction = Vector3.zero;
+    [System.Serializable]
+    private class MovementSettings
+    {
+        public float MaxSpeed;
+        public float CurrentSpeed;
+        public float Acceleration;
+        public float Deceleration;
 
+        public MovementSettings(float maxSpeed, float accel, float decel)
+        {
+            MaxSpeed = maxSpeed;
+            CurrentSpeed = 0;
+            Acceleration = accel;
+            Deceleration = decel;
+        }
+    }
+
+    [Header("References")]
     public Camera playerCam;
+    private CharacterController player;
     private Rigidbody rb;
 
-    [SerializeField] private float maxSpeed;
-    [SerializeField] private float currentSpeed;
+    [Header("Movement")]
+    private Vector3 desiredMovement = Vector3.zero;
+    private Vector3 finalVelocity = Vector3.zero;
+    private Vector3 lastDirectionRecorded = Vector3.zero;
+    [SerializeField] private float gravity;
+    [SerializeField] private float friction;
 
-    [SerializeField] private float acceleration;
-    [SerializeField] private float desiredRotationSpeed;
+    [SerializeField] private MovementSettings m_GroundSettings = new MovementSettings(7, 14, 18);
+    [SerializeField] private MovementSettings m_AirSettings = new MovementSettings(7, 8, 5);
+    [SerializeField] private MovementSettings m_StrafeSettings = new MovementSettings(1, 50, 50);
 
+    [Header("Jump")]
     [SerializeField] private float jumpForce;
-    [SerializeField] private bool jump;
+    private bool jump;
+    private bool validJump;
+    [SerializeField] private float validateJump_offsetY;
+
+    
+
 
     // Use this for initialization
     private void Start()
@@ -37,11 +63,11 @@ public class PlayerMovementRB : MonoBehaviour
     private void Update()
     {
         // Get input
-        direction = new Vector3(Manager_Input._INPUT_MANAGER.GetLeftAxis().x, 0, Manager_Input._INPUT_MANAGER.GetLeftAxis().y);
+        desiredMovement = new Vector3(Manager_Input._INPUT_MANAGER.GetLeftAxis().x, 0, Manager_Input._INPUT_MANAGER.GetLeftAxis().y);
         //float directionX = Manager_Input._INPUT_MANAGER.GetLeftAxis().x;
         //float directionY = Manager_Input._INPUT_MANAGER.GetLeftAxis().y;
         //Vector3 directionXZ = direction * playerCam.transform.forward;
-        direction.Normalize();
+        desiredMovement.Normalize();
         //Debug.Log(direction.x + "  " + direction.z);
 
         //ALEX MOVEMENT
@@ -63,7 +89,7 @@ public class PlayerMovementRB : MonoBehaviour
         }
         */
 
-        if (Manager_Input._INPUT_MANAGER.GetJumpButtonDown()) 
+        if (Manager_Input._INPUT_MANAGER.GetJumpButtonDown() || validJump) 
         {
             jump = true;
             Debug.Log("JUMP");
@@ -75,7 +101,7 @@ public class PlayerMovementRB : MonoBehaviour
     private void FixedUpdate()
     {
 
-        Vector3 newPosition = transform.position + (currentSpeed * Time.deltaTime * (playerCam.transform.forward * direction.z + playerCam.transform.right * direction.x));
+        Vector3 newPosition = transform.position + (m_GroundSettings.CurrentSpeed * Time.deltaTime * (playerCam.transform.forward * desiredMovement.z + playerCam.transform.right * desiredMovement.x));
         rb.MovePosition(newPosition);
         //Debug.Log(newPosition.x + "  " + newPosition.y + "  " + newPosition.z);
 

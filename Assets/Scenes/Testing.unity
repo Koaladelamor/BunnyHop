@@ -249,8 +249,8 @@ MonoBehaviour:
   m_AirSettings:
     MaxSpeed: 7
     CurrentSpeed: 0
-    Acceleration: 8
-    Deceleration: 5
+    Acceleration: 4
+    Deceleration: 4
   m_StrafeSettings:
     MaxSpeed: 1
     CurrentSpeed: 0
@@ -532,6 +532,7 @@ MonoBehaviour:
   rotationY: 0
   sensX: 10
   sensY: 10
+  cameraLerp: 4
 --- !u!1 &993945355
 GameObject:
   m_ObjectHideFlags: 0
