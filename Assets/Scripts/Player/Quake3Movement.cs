@@ -49,7 +49,7 @@ namespace Q3Movement
         private Vector3 m_PlayerVelocity = Vector3.zero;
 
         // Used to queue the next jump just before hitting the ground.
-        private bool m_JumpQueued = false;
+        [SerializeField] private bool m_JumpQueued = false;
 
         // Used to display real time friction values.
         private float m_PlayerFriction = 0;
@@ -221,7 +221,7 @@ namespace Q3Movement
             // Reset the gravity velocity
             m_PlayerVelocity.y = -m_Gravity * Time.deltaTime;
 
-            if (m_JumpQueued)
+            if (Manager_Input._INPUT_MANAGER.GetJumpButtonDown())
             {
                 m_PlayerVelocity.y = m_JumpForce;
                 m_JumpQueued = false;
@@ -278,6 +278,11 @@ namespace Q3Movement
 
             m_PlayerVelocity.x += accelspeed * targetDir.x;
             m_PlayerVelocity.z += accelspeed * targetDir.z;
+        }
+
+        private void OnGUI()
+        {
+            GUI.TextArea(new Rect(600, 10, 130, 20), "Speed XZ  " + new Vector3(m_PlayerVelocity.x, 0, m_PlayerVelocity.z).sqrMagnitude.ToString());
         }
     }
 }
