@@ -110,7 +110,32 @@ public class PlayerMovementCC : MonoBehaviour
         //Debug.Log("Velocity XZ: " + Vector3.SqrMagnitude(new Vector3(player.velocity.x, 0, player.velocity.z)));
     }
 
-    private void AirMovement(Vector3 direction) 
+    private void GroundMovement(Vector3 direction) 
+    {
+        // Friction
+        if (player.isGrounded && !jumpQueued) {
+            ApplyFriction(1.0f);
+        }
+        else if (!player.isGrounded || jumpQueued) {
+            ApplyFriction(0.0f);
+        }
+
+        // Calculate direction
+        Vector3 wishDir = new Vector3(direction.x, 0, direction.z);
+        wishDir = transform.TransformDirection(wishDir);
+        wishDir.Normalize();
+
+        float wishSpeed = wishDir.magnitude;
+        wishSpeed *= m_GroundSettings.MaxSpeed;
+        //Debug.Log("wishSpeed: " + wishSpeed);
+
+        Accelerate(wishDir, wishSpeed, m_GroundSettings.Acceleration);
+
+        // Reset gravity velocity
+        finalVelocity.y = direction.y * gravity * Time.deltaTime;
+    }
+
+    private void AirMovement(Vector3 direction)
     {
         // Calculate direction and speed
         Vector3 wishDir = new Vector3(direction.x, 0, direction.z);
@@ -121,9 +146,10 @@ public class PlayerMovementCC : MonoBehaviour
         wishSpeed *= m_AirSettings.MaxSpeed;
 
         float acceleration = m_AirSettings.Acceleration;
-        /*
-        float currentSpeed = Vector3.Dot(finalVelocity, wishDir);
-        if (currentSpeed < 0) {
+
+        /*float currentSpeed = Vector3.Dot(finalVelocity, wishDir);
+        if (currentSpeed < 0)
+        {
             acceleration = m_AirSettings.Deceleration;
         }*/
 
@@ -146,47 +172,15 @@ public class PlayerMovementCC : MonoBehaviour
         finalVelocity.y += -gravity * Time.deltaTime;
     }
 
-    private void GroundMovement(Vector3 direction) 
-    {
-        // Friction
-        if (player.isGrounded && !jumpQueued) {
-            ApplyFriction(1.0f);
-        }
-        else if (!player.isGrounded) {
-            ApplyFriction(0.0f);
-        }
-
-        // Calculate direction
-        Vector3 wishDir = new Vector3(direction.x, 0, direction.z);
-        wishDir = transform.TransformDirection(wishDir);
-        wishDir.Normalize();
-
-        float wishSpeed = wishDir.magnitude;
-        wishSpeed *= m_GroundSettings.MaxSpeed;
-
-        Accelerate(wishDir, wishSpeed, m_GroundSettings.Acceleration);
-
-        // Reset gravity velocity
-        finalVelocity.y = direction.y * gravity * Time.deltaTime;
-    }
-
     private void Accelerate(Vector3 targetDir, float targetSpeed, float acceleration)
     {
         float currentspeed = Vector3.Dot(finalVelocity, targetDir);
 
-
-        /*float addspeed = targetSpeed - currentspeed;
-        float accelVel = acceleration * Time.deltaTime * addspeed;
-
-        // Clamp
-        if (currentspeed + accelVel > targetSpeed) {
-            accelVel = targetSpeed - currentspeed;
-        }
-
-        finalVelocity.x += accelVel * targetDir.x;
-        finalVelocity.z += accelVel * targetDir.z;
-        */
         float addspeed = targetSpeed - currentspeed;
+
+
+
+        
         if (addspeed <= 0)
         {
             return;
@@ -199,9 +193,22 @@ public class PlayerMovementCC : MonoBehaviour
         {
             accelspeed = addspeed;
         }
+
+        Vector3 velocity = finalVelocity;
+        velocity.y = 0;
+        float currentVelocity = velocity.magnitude;
+        Debug.Log("currentVel : " + currentVelocity);
         //Debug.Log("accelspeed : " + accelspeed);
         finalVelocity.x += accelspeed * targetDir.x;
         finalVelocity.z += accelspeed * targetDir.z;
+
+        Debug.Log("finalVel.y : " + finalVelocity.y);
+
+        Vector3 clampedVelocity = Mathf.Clamp(currentVelocity, 0, 250) * transform.forward;
+
+        finalVelocity = new Vector3(clampedVelocity.x, finalVelocity.magnitude - currentVelocity, clampedVelocity.z);
+        
+
     }
 
     private void ApplyFriction(float t)
