@@ -7,6 +7,9 @@ public class Manager_Audio : MonoBehaviour
 
     public static Manager_Audio _AUDIO_MANAGER;
 
+
+    //[SerializeField] private float _volume;
+    //[SerializeField] private bool _mute;
     private void Awake()
     {
         if (_AUDIO_MANAGER != null && _AUDIO_MANAGER != this)
@@ -29,6 +32,6 @@ public class Manager_Audio : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        
+
     }
 }

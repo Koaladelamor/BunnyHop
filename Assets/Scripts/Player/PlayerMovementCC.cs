@@ -177,16 +177,23 @@ public class PlayerMovementCC : MonoBehaviour
         float currentspeed = Vector3.Dot(finalVelocity, targetDir);
 
         float addspeed = targetSpeed - currentspeed;
-
-
-
         
         if (addspeed <= 0)
         {
             return;
         }
 
-        float accelspeed = acceleration * Time.deltaTime * targetSpeed;
+        Vector3 velocity = finalVelocity;
+        velocity.y = 0;
+        float currentVelocity = velocity.sqrMagnitude;
+        float modifier = 1;
+        if (currentVelocity > 50 && currentVelocity < 125) { modifier = 0.85f; }
+        else if (currentVelocity >= 125 && currentVelocity < 200) { modifier = 0.65f; }
+        else if (currentVelocity >= 200 && currentVelocity < 250) { modifier = 0.45f; }
+        else if (currentVelocity >= 250 && currentVelocity < 300) { modifier = 0.3f; }
+        else if (currentVelocity >= 300) { modifier = 0.05f; }
+
+        float accelspeed = acceleration * Time.deltaTime * targetSpeed * modifier;
         //Debug.Log("addspeed : " + addspeed);
         
         if (accelspeed > addspeed)
@@ -194,20 +201,21 @@ public class PlayerMovementCC : MonoBehaviour
             accelspeed = addspeed;
         }
 
-        Vector3 velocity = finalVelocity;
-        velocity.y = 0;
-        float currentVelocity = velocity.magnitude;
-        Debug.Log("currentVel : " + currentVelocity);
+
+        //Debug.Log("currentVel : " + currentVelocity);
         //Debug.Log("accelspeed : " + accelspeed);
         finalVelocity.x += accelspeed * targetDir.x;
         finalVelocity.z += accelspeed * targetDir.z;
 
-        Debug.Log("finalVel.y : " + finalVelocity.y);
+        //Debug.Log("finalVel.y : " + finalVelocity.y);
+        //Vector3 clampedVelocity = Mathf.Clamp(currentVelocity, 0, 250) * transform.forward;
+        //currentVelocity = Mathf.Clamp(currentVelocity, 0, 250);
+        //Debug.Log("vel z: " + clampedVelocity.z + " vel x: " + clampedVelocity.x + " vel y: " + clampedVelocity.y);
+        //Debug.Log("vel z: " + finalVelocity.z + " vel x: " + finalVelocity.x + " vel y: " + finalVelocity.y);
+        //Debug.Log(currentVelocity);
 
-        Vector3 clampedVelocity = Mathf.Clamp(currentVelocity, 0, 250) * transform.forward;
+        //finalVelocity = new Vector3(clampedVelocity.x, finalVelocity.y, clampedVelocity.z);
 
-        finalVelocity = new Vector3(clampedVelocity.x, finalVelocity.magnitude - currentVelocity, clampedVelocity.z);
-        
 
     }
 
@@ -255,7 +263,7 @@ public class PlayerMovementCC : MonoBehaviour
 
     private void OnGUI()
     {
-        GUI.TextArea(new Rect(600, 75, 130, 20), "Speed XZ  " + new Vector3(finalVelocity.x, 0, finalVelocity.z).sqrMagnitude.ToString());
+        GUI.TextArea(new Rect(130, 60, 130, 20), "Speed XZ  " + new Vector3(finalVelocity.x, 0, finalVelocity.z).sqrMagnitude.ToString());
     }
     
 }

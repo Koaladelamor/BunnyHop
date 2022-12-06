@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Interactions;
 
 public class Manager_Input : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class Manager_Input : MonoBehaviour
     private Vector2 leftAxisValue = Vector2.zero;
     private Vector2 rightAxisValue = Vector2.zero;
     private float timeSinceJumpPressed = 0f;
+    private bool jumpReleased = true;
 
     public PlayerInputActions playerInputs;
 
@@ -25,11 +27,16 @@ public class Manager_Input : MonoBehaviour
         else 
         {
             playerInputs = new PlayerInputActions();
-            playerInputs.Character.Enable();
+            //playerInputs.Character.Enable();
+            
 
             playerInputs.Character.Jump.performed += JumpButtonPressed;
+            playerInputs.Character.Jump.canceled += JumpButtonReleased;
             playerInputs.Character.Move.performed += LeftAxisUpdate;
             playerInputs.Character.Turn.performed += RightAxisUpdate;
+
+            playerInputs.UI.Enable();
+
 
             _INPUT_MANAGER = this;
             DontDestroyOnLoad(this);
@@ -55,7 +62,14 @@ public class Manager_Input : MonoBehaviour
     private void JumpButtonPressed(InputAction.CallbackContext context)
     {
         //Debug.Log("Space Pressed");
+        jumpReleased = false;
         timeSinceJumpPressed = 0f;
+    }
+
+    private void JumpButtonReleased(InputAction.CallbackContext context)
+    {
+        jumpReleased = true;
+        //Debug.Log("Space Released");
     }
 
     private void LeftAxisUpdate(InputAction.CallbackContext context)
@@ -91,5 +105,21 @@ public class Manager_Input : MonoBehaviour
     {
         return timeSinceJumpPressed == 0f;
     }
+
+    public bool GetJumpButtonReleased()
+    {
+        return jumpReleased;
+    }
     #endregion
+
+    public void EnablePlayerInput() {
+        playerInputs.UI.Disable();
+        playerInputs.Character.Enable();
+    }
+
+    public void EnableUIInput()
+    {
+        playerInputs.Character.Disable();
+        playerInputs.UI.Enable();
+    }
 }
