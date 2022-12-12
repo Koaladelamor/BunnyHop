@@ -63,7 +63,7 @@ public class PlayerMovementRB : MonoBehaviour
     private void Update()
     {
         // Get input
-        desiredMovement = new Vector3(Manager_Input._INPUT_MANAGER.GetLeftAxis().x, 0, Manager_Input._INPUT_MANAGER.GetLeftAxis().y);
+        desiredMovement = new Vector3(InputManager.Instance.GetLeftAxis().x, 0, InputManager.Instance.GetLeftAxis().y);
         //float directionX = Manager_Input._INPUT_MANAGER.GetLeftAxis().x;
         //float directionY = Manager_Input._INPUT_MANAGER.GetLeftAxis().y;
         //Vector3 directionXZ = direction * playerCam.transform.forward;
@@ -89,7 +89,7 @@ public class PlayerMovementRB : MonoBehaviour
         }
         */
 
-        if (Manager_Input._INPUT_MANAGER.GetJumpButtonDown() || validJump) 
+        if (InputManager.Instance.GetJumpButtonDown() || validJump) 
         {
             jump = true;
             Debug.Log("JUMP");

@@ -46,7 +46,7 @@ public class InputKeys : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        Vector3 inputMovement = new Vector3(Manager_Input._INPUT_MANAGER.GetLeftAxis().x, 0, Manager_Input._INPUT_MANAGER.GetLeftAxis().y);
+        Vector3 inputMovement = new Vector3(InputManager.Instance.GetLeftAxis().x, 0, InputManager.Instance.GetLeftAxis().y);
         inputMovement.Normalize();
 
         if (inputMovement.z > 0)
@@ -85,7 +85,7 @@ public class InputKeys : MonoBehaviour
             m_light_images['a'].enabled = false;
         }
 
-        if (Manager_Input._INPUT_MANAGER.GetJumpButtonDown() || !Manager_Input._INPUT_MANAGER.GetJumpButtonReleased())
+        if (InputManager.Instance.GetJumpButtonDown() || !InputManager.Instance.GetJumpButtonReleased())
         { // JUMP
             m_light_images['j'].enabled = true;
         }

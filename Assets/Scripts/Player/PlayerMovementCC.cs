@@ -1,5 +1,3 @@
-
-using Q3Movement;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,8 +10,6 @@ using Debug = UnityEngine.Debug;
 
 public class PlayerMovementCC : MonoBehaviour
 {
-
-    
 
     [System.Serializable]
     private class MovementSettings
@@ -31,9 +27,12 @@ public class PlayerMovementCC : MonoBehaviour
     }
 
     [Header("References")]
-    public Camera playerCam;
-    private CharacterController player;
-    private MouseLook m_mouseLook = new MouseLook();
+    private Camera m_playerCam;
+    private CharacterController m_player;
+    private CharacterCamera m_characterCamera;
+
+    [SerializeField] private Conductor m_conductor;
+    private PlayerCheckpoint _playerCheckpoint = new PlayerCheckpoint();
 
     [Header("Movement")]
     private Vector3 finalVelocity = Vector3.zero;
@@ -50,20 +49,41 @@ public class PlayerMovementCC : MonoBehaviour
     [Header("Jump")]
     [SerializeField] private float jumpForce;
     [SerializeField] private bool jumpQueued;
+    [SerializeField] private bool onBeatJump;
     [SerializeField] private float validateJump_offsetY;
+
+    [Header("Checkpoint")]
+    [SerializeField] private bool loadingCheckpoint;
+    [SerializeField] private bool checkPosition;
+
+    private void Awake()
+    {
+        m_player = this.GetComponent<CharacterController>();
+        m_characterCamera = this.GetComponent<CharacterCamera>();
+        m_playerCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        m_conductor = GameObject.FindGameObjectWithTag("Conductor").GetComponent<Conductor>();
+    }
+
     // Use this for initialization
-    void Start()
+    private void Start()
     {
         jumpQueued = false;
-        player = this.GetComponent<CharacterController>();
+
         //m_mouseLook.Init(transform, playerCam.transform);
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        //if (loadingCheckpoint) { return; }
+
+        if (loadingCheckpoint) {
+            checkPosition = true;
+            return; 
+        }
+
         // Get input
-        Vector3 inputMovement = new Vector3(Manager_Input._INPUT_MANAGER.GetLeftAxis().x, 0, Manager_Input._INPUT_MANAGER.GetLeftAxis().y);
+        Vector3 inputMovement = new Vector3(InputManager.Instance.GetLeftAxis().x, 0, InputManager.Instance.GetLeftAxis().y);
         inputMovement.Normalize();
 
         //Vector3 desiredMovement = Quaternion.Euler(0f, playerCam.transform.eulerAngles.y, 0f) * new Vector3(inputMovement.x, 0, inputMovement.z);
@@ -80,15 +100,23 @@ public class PlayerMovementCC : MonoBehaviour
 
         
 
-        if (player.isGrounded)
+        if (m_player.isGrounded)
         {
             // Jump
-            if (Manager_Input._INPUT_MANAGER.GetJumpButtonDown() || jumpQueued)
+            if (InputManager.Instance.GetJumpButtonDown() || jumpQueued)
             {
+                if (m_conductor.GetBeatOnHit())
+                {
+                    onBeatJump = true;
+                    //jumpQueued = false;
+                    //finalVelocity.y = jumpForce * 2f;
+                    Debug.Log("SUPER JUMP");
+                }
                 jumpQueued = false;
                 finalVelocity.y = jumpForce;
             }
-            else {
+            else 
+            {
                 GroundMovement(inputMovement);
             }
         }
@@ -101,8 +129,9 @@ public class PlayerMovementCC : MonoBehaviour
         // Physically move and rotate player
         //transform.rotation = Quaternion.Euler(0, playerCam.transform.eulerAngles.y, 0);
         //m_mouseLook.LookRotation(transform, playerCam.transform);
-        player.Move(finalVelocity * Time.deltaTime);
+        m_player.Move(finalVelocity * Time.deltaTime);
 
+        
 
         /* VELOCITY DEBUG */
         //Debug.Log("vel z: " + finalVelocity.z + " vel x: " + finalVelocity.x);
@@ -110,13 +139,51 @@ public class PlayerMovementCC : MonoBehaviour
         //Debug.Log("Velocity XZ: " + Vector3.SqrMagnitude(new Vector3(player.velocity.x, 0, player.velocity.z)));
     }
 
+    private void LateUpdate()
+    {
+        if (InputManager.Instance.GetCheckpointSaveButtonDown())
+        {
+            Debug.Log("Checkpoint");
+            _playerCheckpoint.SaveCheckpoint(this.transform.position, this.transform.rotation, m_playerCam.transform.localRotation);
+        }
+        else if (InputManager.Instance.GetCheckpointLoadButtonDown())
+        {
+            Debug.Log("Loading Checkpoint");
+            loadingCheckpoint = true;
+            m_characterCamera.SetCanRotate(false);
+            m_playerCam.transform.localRotation = _playerCheckpoint.GetLastCheckpointCamRotation();
+            this.transform.position = _playerCheckpoint.GetLastCheckpointPosition();
+            this.transform.rotation = _playerCheckpoint.GetLastCheckpointRotation();
+            //_playerCheckpoint.LoadCheckpoint();
+        }
+
+        if (checkPosition)
+        {
+            if (transform.position != _playerCheckpoint.GetLastCheckpointPosition())
+            {
+                Debug.Log("Loading Checkpoint Again");
+                m_playerCam.transform.rotation = _playerCheckpoint.GetLastCheckpointCamRotation();
+                transform.position = _playerCheckpoint.GetLastCheckpointPosition();
+                transform.rotation = _playerCheckpoint.GetLastCheckpointRotation();
+            }
+            else
+            {
+                Debug.Log("Checkpoint Loaded");
+                loadingCheckpoint = false;
+                checkPosition = false;
+                m_characterCamera.SetCanRotate(true);
+            }
+        }
+
+    }
+
     private void GroundMovement(Vector3 direction) 
     {
         // Friction
-        if (player.isGrounded && !jumpQueued) {
+        if (m_player.isGrounded && !jumpQueued) {
             ApplyFriction(1.0f);
         }
-        else if (!player.isGrounded || jumpQueued) {
+        else if (!m_player.isGrounded || jumpQueued) {
             ApplyFriction(0.0f);
         }
 
@@ -127,6 +194,10 @@ public class PlayerMovementCC : MonoBehaviour
 
         float wishSpeed = wishDir.magnitude;
         wishSpeed *= m_GroundSettings.MaxSpeed;
+        if(onBeatJump) {
+            onBeatJump = false;
+            wishSpeed *= 5f;
+        }
         //Debug.Log("wishSpeed: " + wishSpeed);
 
         Accelerate(wishDir, wishSpeed, m_GroundSettings.Acceleration);
@@ -248,17 +319,24 @@ public class PlayerMovementCC : MonoBehaviour
         // Raycasts to calculate ground and validate jump
         Vector3 playerFeet = transform.position + new Vector3(0, -1f, 0);
 
-        if (Physics.Linecast(playerFeet + new Vector3(0.2f, 0, 0), playerFeet + new Vector3(0.2f, validateJump_offsetY, 0)) && Manager_Input._INPUT_MANAGER.GetJumpButtonDown())
+        if (Physics.Linecast(playerFeet + new Vector3(0.2f, 0, 0), playerFeet + new Vector3(0.2f, validateJump_offsetY, 0)) && InputManager.Instance.GetJumpButtonDown())
         {
             jumpQueued = true;
         }
 
-        if (Physics.Linecast(playerFeet + new Vector3(-0.2f, 0, 0), playerFeet + new Vector3(-0.2f, validateJump_offsetY, 0)) && Manager_Input._INPUT_MANAGER.GetJumpButtonDown())
+        if (Physics.Linecast(playerFeet + new Vector3(-0.2f, 0, 0), playerFeet + new Vector3(-0.2f, validateJump_offsetY, 0)) && InputManager.Instance.GetJumpButtonDown())
         {
             jumpQueued = true;
         }
         //Debug.DrawLine(playerFeet + new Vector3(0.2f, 0, 0), playerFeet + new Vector3(0.2f, offsetY, 0));
         //Debug.DrawLine(playerFeet + new Vector3(-0.2f, 0, 0), playerFeet + new Vector3(-0.2f, offsetY, 0));
+    }
+
+    public void SetTransform(Vector3 newPosition, Quaternion newRotation) 
+    {
+        transform.rotation = newRotation;
+        transform.position = newPosition;
+        //Debug.Log("Load Position " + newTransform.position);
     }
 
     private void OnGUI()

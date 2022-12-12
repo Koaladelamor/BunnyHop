@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 
 public class CharacterCamera : MonoBehaviour
 {
+    [SerializeField] private bool canRotate = true;
 
     [SerializeField] private float mouseX;
     [SerializeField] private float mouseY;
@@ -41,7 +42,9 @@ public class CharacterCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        rightAxisInput = Manager_Input._INPUT_MANAGER.GetRightAxis();
+        if (!canRotate) { return; }
+
+        rightAxisInput = InputManager.Instance.GetRightAxis();
         //mouseX = rightAxisInput.x * sensY * Time.deltaTime;
         //mouseY = rightAxisInput.y * sensX * Time.deltaTime;
 
@@ -71,6 +74,6 @@ public class CharacterCamera : MonoBehaviour
 
     }
 
-
+    public void SetCanRotate(bool _canRotate) { canRotate = _canRotate; }
 
 }
