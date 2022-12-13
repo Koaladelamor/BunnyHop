@@ -82,6 +82,8 @@ public class PlayerMovementCC : MonoBehaviour
             return; 
         }
 
+        if (GameManager.Instance.GetGamePaused()) { return; }
+
         // Get input
         Vector3 inputMovement = new Vector3(InputManager.Instance.GetLeftAxis().x, 0, InputManager.Instance.GetLeftAxis().y);
         inputMovement.Normalize();

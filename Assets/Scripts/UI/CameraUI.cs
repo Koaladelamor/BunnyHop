@@ -31,16 +31,17 @@ public class CameraUI : MonoBehaviour
         {
             Debug.Log("menu OFF");
             menuOnScreen = false;
-            InputManager.Instance.EnablePlayerInput();
             ContinueButton();
+            InputManager.Instance.EnablePlayerInput();
+            GameManager.Instance.SetGamePaused(false);
         }
         else if (InputManager.Instance.GetMenuButtonDown() && !menuOnScreen)
         {
             Debug.Log("menu ON");
             menuOnScreen = true;
-            InputManager.Instance.EnableUIInput();
             DisplayMenuInGame();
-            Time.timeScale = 0;
+            InputManager.Instance.EnableUIInput();
+            GameManager.Instance.SetGamePaused(true);
         }
 
     }
@@ -72,7 +73,6 @@ public class CameraUI : MonoBehaviour
     public void ContinueButton() 
     {
         HideMenuInGame();
-        Time.timeScale = 1;
     }
 
     public void RestartButton() 

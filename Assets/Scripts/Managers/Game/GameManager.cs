@@ -6,6 +6,8 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance;
 
+    [SerializeField] private bool gamePaused;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -64,4 +66,9 @@ public class GameManager : MonoBehaviour
         Application.Quit();
 #endif
     }
+
+
+    public void SetGamePaused(bool paused) { gamePaused = paused; }
+
+    public bool GetGamePaused() { return gamePaused; }
 }
