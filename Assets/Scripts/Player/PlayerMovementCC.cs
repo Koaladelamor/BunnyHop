@@ -1,11 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
-using static UnityEditor.PlayerSettings;
 using Debug = UnityEngine.Debug;
 
 public class PlayerMovementCC : MonoBehaviour
@@ -77,9 +70,10 @@ public class PlayerMovementCC : MonoBehaviour
     {
         //if (loadingCheckpoint) { return; }
 
-        if (loadingCheckpoint) {
+        if (loadingCheckpoint)
+        {
             checkPosition = true;
-            return; 
+            return;
         }
 
         if (GameManager.Instance.GetGamePaused()) { return; }
@@ -153,13 +147,16 @@ public class PlayerMovementCC : MonoBehaviour
             Debug.Log("Loading Checkpoint");
             loadingCheckpoint = true;
             m_characterCamera.SetCanRotate(false);
+            //finalVelocity = new Vector3(0.01f, -1f, 0.01f);
             m_playerCam.transform.localRotation = _playerCheckpoint.GetLastCheckpointCamRotation();
             this.transform.position = _playerCheckpoint.GetLastCheckpointPosition();
             this.transform.rotation = _playerCheckpoint.GetLastCheckpointRotation();
             //_playerCheckpoint.LoadCheckpoint();
+
+            //UnityEditor.EditorApplication.isPaused = true;
         }
 
-        if (checkPosition)
+        /*if (checkPosition)
         {
             if (transform.position != _playerCheckpoint.GetLastCheckpointPosition())
             {
@@ -175,7 +172,7 @@ public class PlayerMovementCC : MonoBehaviour
                 checkPosition = false;
                 m_characterCamera.SetCanRotate(true);
             }
-        }
+        }*/
 
     }
 
@@ -284,7 +281,7 @@ public class PlayerMovementCC : MonoBehaviour
         //Vector3 clampedVelocity = Mathf.Clamp(currentVelocity, 0, 250) * transform.forward;
         //currentVelocity = Mathf.Clamp(currentVelocity, 0, 250);
         //Debug.Log("vel z: " + clampedVelocity.z + " vel x: " + clampedVelocity.x + " vel y: " + clampedVelocity.y);
-        //Debug.Log("vel z: " + finalVelocity.z + " vel x: " + finalVelocity.x + " vel y: " + finalVelocity.y);
+        Debug.Log("vel z: " + finalVelocity.z + " vel x: " + finalVelocity.x + " vel y: " + finalVelocity.y);
         //Debug.Log(currentVelocity);
 
         //finalVelocity = new Vector3(clampedVelocity.x, finalVelocity.y, clampedVelocity.z);
@@ -345,5 +342,10 @@ public class PlayerMovementCC : MonoBehaviour
     {
         GUI.TextArea(new Rect(130, 60, 130, 20), "Speed XZ  " + new Vector3(finalVelocity.x, 0, finalVelocity.z).sqrMagnitude.ToString());
     }
-    
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawSphere(_playerCheckpoint.GetLastCheckpointPosition(), 1f);
+    }
+
 }

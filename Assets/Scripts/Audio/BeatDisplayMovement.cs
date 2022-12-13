@@ -9,11 +9,15 @@ public class BeatDisplayMovement : MonoBehaviour
     [SerializeField] private Vector3 beatVelocity;
     //[SerializeField] private bool onBeat;
     private Conductor _conductor;
-    
+
+    private void Awake()
+    {
+        _conductor = GameObject.FindGameObjectWithTag("Conductor").GetComponent<Conductor>();
+    }
     // Start is called before the first frame update
     private void Start()
     {
-        _conductor = GameObject.FindGameObjectWithTag("Conductor").GetComponent<Conductor>();
+        
     }
 
     // Update is called once per frame

@@ -1,11 +1,4 @@
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 using Debug = UnityEngine.Debug;
 
 public class PlayerMovementRB : MonoBehaviour

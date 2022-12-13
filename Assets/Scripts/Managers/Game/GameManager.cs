@@ -54,6 +54,12 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("FirstLevel");
     }
 
+    public void LoadTutorial()
+    {
+        InputManager.Instance.EnablePlayerInput();
+        SceneManager.LoadScene("Tutorial");
+    }
+
     public void LoadMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
@@ -67,6 +73,7 @@ public class GameManager : MonoBehaviour
 #endif
     }
 
+    public string GetCurrentSceneName() { return SceneManager.GetActiveScene().name; }
 
     public void SetGamePaused(bool paused) { gamePaused = paused; }
 

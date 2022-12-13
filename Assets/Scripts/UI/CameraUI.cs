@@ -29,18 +29,20 @@ public class CameraUI : MonoBehaviour
     {
         if (InputManager.Instance.GetMenuButtonDown() && menuOnScreen) 
         {
-            Debug.Log("menu OFF");
-            menuOnScreen = false;
+            //Debug.Log("menu OFF");
+            //menuOnScreen = false;
             ContinueButton();
-            InputManager.Instance.EnablePlayerInput();
-            GameManager.Instance.SetGamePaused(false);
+            //InputManager.Instance.EnablePlayerInput();
+            //Cursor.lockState = CursorLockMode.Locked;
+            //GameManager.Instance.SetGamePaused(false);
         }
         else if (InputManager.Instance.GetMenuButtonDown() && !menuOnScreen)
         {
             Debug.Log("menu ON");
             menuOnScreen = true;
             DisplayMenuInGame();
-            InputManager.Instance.EnableUIInput();
+            //InputManager.Instance.EnableUIInput();
+            Cursor.lockState = CursorLockMode.None;
             GameManager.Instance.SetGamePaused(true);
         }
 
@@ -73,6 +75,11 @@ public class CameraUI : MonoBehaviour
     public void ContinueButton() 
     {
         HideMenuInGame();
+        Debug.Log("menu OFF");
+        menuOnScreen = false;
+        //InputManager.Instance.EnablePlayerInput();
+        Cursor.lockState = CursorLockMode.Locked;
+        GameManager.Instance.SetGamePaused(false);
     }
 
     public void RestartButton() 

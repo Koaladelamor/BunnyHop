@@ -7,7 +7,7 @@ public class BeatBar : MonoBehaviour
 
     [SerializeField] private RectTransform spawnTransform;
     [SerializeField] private RectTransform hitPoint;
-    //[SerializeField] private RectTransform destroyTransform;
+    [SerializeField] private RectTransform destroyTransform;
 
     [SerializeField] private GameObject beatPrefab;
 
@@ -25,11 +25,24 @@ public class BeatBar : MonoBehaviour
     [SerializeField] private bool startSong;
     [SerializeField] private int beatCount;
 
-    
+    private void Awake()
+    {
+        _conductor = GameObject.FindGameObjectWithTag("Conductor").GetComponent<Conductor>();
+        spawnTransform = GameObject.Find("SpawnBeat").GetComponent<RectTransform>();
+        destroyTransform = GameObject.Find("DestroyBeat").GetComponent<RectTransform>();
+        hitPoint = GameObject.Find("Hit").GetComponent<RectTransform>();
+        
+    }
 
     // Start is called before the first frame update
     void Start()
     {
+        if (GameManager.Instance.GetCurrentSceneName() == "Tutorial") 
+        { 
+            this.gameObject.SetActive(false);
+            _conductor.gameObject.SetActive(false);
+        }
+
         startSong = false;
         songOffset = _conductor.GetBeatOffset();
         songBpm = _conductor.GetSongBPM();

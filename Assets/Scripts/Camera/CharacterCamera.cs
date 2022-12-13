@@ -42,7 +42,7 @@ public class CharacterCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (!canRotate) { return; }
+        if (!canRotate || GameManager.Instance.GetGamePaused()) { return; }
 
         rightAxisInput = InputManager.Instance.GetRightAxis();
         //mouseX = rightAxisInput.x * sensY * Time.deltaTime;
