@@ -7,6 +7,7 @@ public class CameraUI : MonoBehaviour
     private GameObject _GUI;
     private GameObject _beatBar;
     private GameObject _menu;
+    private Conductor _conductor;
 
     private bool menuOnScreen;
 
@@ -15,6 +16,7 @@ public class CameraUI : MonoBehaviour
         _GUI = GameObject.FindGameObjectWithTag("GUI");
         _beatBar = GetComponentInChildren<BeatBar>().gameObject;
         _menu = GameObject.FindGameObjectWithTag("MenuInGame");
+        _conductor = GameObject.FindGameObjectWithTag("Conductor").GetComponent<Conductor>();
     }
 
     // Start is called before the first frame update
@@ -35,15 +37,18 @@ public class CameraUI : MonoBehaviour
             //InputManager.Instance.EnablePlayerInput();
             //Cursor.lockState = CursorLockMode.Locked;
             //GameManager.Instance.SetGamePaused(false);
+            _conductor.UnpauseSong();
         }
         else if (InputManager.Instance.GetMenuButtonDown() && !menuOnScreen)
         {
-            Debug.Log("menu ON");
+            //Debug.Log("menu ON");
             menuOnScreen = true;
             DisplayMenuInGame();
             //InputManager.Instance.EnableUIInput();
+            Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             GameManager.Instance.SetGamePaused(true);
+            _conductor.PauseSong();
         }
 
     }
@@ -75,9 +80,10 @@ public class CameraUI : MonoBehaviour
     public void ContinueButton() 
     {
         HideMenuInGame();
-        Debug.Log("menu OFF");
+        //Debug.Log("menu OFF");
         menuOnScreen = false;
         //InputManager.Instance.EnablePlayerInput();
+        Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         GameManager.Instance.SetGamePaused(false);
     }
@@ -87,8 +93,17 @@ public class CameraUI : MonoBehaviour
         GameManager.Instance.LoadFirstLevel();
     }
 
-    public void ExitButton()
+    public void MainMenuButton()
     {
         GameManager.Instance.LoadMainMenu();
+    }
+
+    public void ExitButton()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }

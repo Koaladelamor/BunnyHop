@@ -82,6 +82,15 @@ public class Conductor : MonoBehaviour
         dspSongTime = (float)AudioSettings.dspTime;
     }
 
+    public void PauseSong() {
+        _audioSource.Pause();
+    }
+
+    public void UnpauseSong()
+    {
+        _audioSource.UnPause();
+    }
+
     public bool IsSongPlaying() { return _audioSource.isPlaying; }
 
     public float GetBeatOffset() { return songFirstBeatOffset; }

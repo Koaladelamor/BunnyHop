@@ -11,6 +11,8 @@ public class InputManager : MonoBehaviour
     private Vector2 leftAxisValue = Vector2.zero;
     private Vector2 rightAxisValue = Vector2.zero;
 
+    private Vector2 mouseScrollValue = Vector2.zero;
+
     private float timeSinceJumpPressed = 0f;
     private bool jumpReleased = true;
 
@@ -42,6 +44,7 @@ public class InputManager : MonoBehaviour
             playerInputs.Character.Jump.canceled += JumpButtonReleased;
             playerInputs.Character.Move.performed += LeftAxisUpdate;
             playerInputs.Character.Turn.performed += RightAxisUpdate;
+            playerInputs.Character.MouseScroll.performed += MouseScrollUpdate;
             playerInputs.Character.Checkpoint_Save.performed += CheckpointSaveButtonPressed;
             playerInputs.Character.Checkpoint_Load.performed += CheckpointLoadButtonPressed;
             playerInputs.Character.Menu.performed += MenuButtonPressed;
@@ -121,6 +124,15 @@ public class InputManager : MonoBehaviour
         //return leftAxisValue;
     }
 
+    private void MouseScrollUpdate(InputAction.CallbackContext context)
+    {
+        mouseScrollValue = context.ReadValue<Vector2>();
+        //Debug.Log("MouseScroll: " + mouseScrollValue);
+        Debug.Log("Magnitude: " + mouseScrollValue.magnitude); 
+        //Debug.Log("Normalize: " + mouseScrollValue.normalized);
+        //return mouseScrollValue;
+    }
+
     #endregion
 
     #region Getters
@@ -132,6 +144,16 @@ public class InputManager : MonoBehaviour
     public Vector2 GetRightAxis()
     {
         return rightAxisValue;
+    }
+
+    public Vector2 GetMouseScroll()
+    {
+        return mouseScrollValue;
+    }
+
+    public float GetMouseScrollMagnitude()
+    {
+        return mouseScrollValue.magnitude;
     }
 
     public bool GetJumpButtonDown() 

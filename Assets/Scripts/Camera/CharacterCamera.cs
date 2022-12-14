@@ -76,4 +76,13 @@ public class CharacterCamera : MonoBehaviour
 
     public void SetCanRotate(bool _canRotate) { canRotate = _canRotate; }
 
+    public void ResetRotation() {
+        rotationX = 0;
+        rotationY = 0;
+    }
+    public void SetRotationXY(float x, float y)
+    {
+        rotationX = x;
+        rotationY = y;
+    }
 }

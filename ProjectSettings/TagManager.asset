@@ -8,6 +8,7 @@ TagManager:
   - Conductor
   - GUI
   - MenuInGame
+  - DestroyBeat
   layers:
   - Default
   - TransparentFX

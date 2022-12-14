@@ -9,8 +9,10 @@ public class AudioManager : MonoBehaviour
 
     [SerializeField] private float musicVolume;
     [SerializeField] private float fxVolume;
-    
+
     [SerializeField] private bool mute;
+
+    [SerializeField] private AudioClip stepLanding;
 
     private void Awake()
     {
@@ -49,4 +51,6 @@ public class AudioManager : MonoBehaviour
     public float GetFXVolume() { return fxVolume; }
 
     public float GetMusicVolume() { return musicVolume; }
+
+    public AudioClip GetStepLanding() { return stepLanding; }
 }

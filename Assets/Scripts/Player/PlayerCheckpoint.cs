@@ -8,10 +8,10 @@ public class PlayerCheckpoint
     private Vector3 playerPosition;
     private Quaternion playerRotation;
 
-    private Quaternion camRotation;
+    private Vector3 camRotation;
 
 
-    public void SaveCheckpoint(Vector3 currentPos, Quaternion currentRot, Quaternion currentCamRotation)
+    public void SaveCheckpoint(Vector3 currentPos, Quaternion currentRot, Vector3 currentCamRotation)
     {
         camRotation = currentCamRotation;
         playerPosition = currentPos;
@@ -31,5 +31,5 @@ public class PlayerCheckpoint
     public Vector3 GetLastCheckpointPosition() { return playerPosition; }
     public Quaternion GetLastCheckpointRotation() { return playerRotation; }
 
-    public Quaternion GetLastCheckpointCamRotation() { return camRotation; }
+    public Vector3 GetLastCheckpointCamRotation() { return camRotation; }
 }

@@ -9,8 +9,11 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private GameObject _gui;
     [SerializeField] private GameObject _beatBar;
     [SerializeField] private Image _dialogueImage;
+    [SerializeField] private GameObject _loadFirstLevel;
 
     [SerializeField] private GameObject _arrowGUI;
+
+    [SerializeField] private GameObject _conductor;
 
     [SerializeField] private string[] dialogues;
     [SerializeField] private int currentDialogueIndex;
@@ -22,6 +25,12 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private bool runDialogue;
 
     private Dictionary<int, float> dialoguesTime = new Dictionary<int, float>();
+
+    private void Awake()
+    {
+        //_conductor = GameObject.FindGameObjectWithTag("Conductor").GetComponent<Conductor>();
+        _conductor = GameObject.FindGameObjectWithTag("Conductor");
+    }
 
     // Start is called before the first frame update
     private void Start()
@@ -37,10 +46,14 @@ public class TutorialManager : MonoBehaviour
         dialoguesTime.Add(0, 3f);
         dialoguesTime.Add(1, 5f);
         dialoguesTime.Add(2, 8f);
-        dialoguesTime.Add(3, 15f);
-        dialoguesTime.Add(4, 8f);
-        dialoguesTime.Add(5, 10f);
-        dialoguesTime.Add(6, 12f);
+        dialoguesTime.Add(3, 12f);
+        dialoguesTime.Add(4, 7f);
+        dialoguesTime.Add(5, 9f);
+        dialoguesTime.Add(6, 10f);
+        dialoguesTime.Add(7, 10f);
+        dialoguesTime.Add(8, 5f);
+        dialoguesTime.Add(9, 8f);
+        dialoguesTime.Add(10, 2f);
     }
 
     // Update is called once per frame
@@ -68,6 +81,11 @@ public class TutorialManager : MonoBehaviour
                     { // Activate input
                         InputManager.Instance.EnablePlayerInput();
                     }
+                    else if (currentDialogueIndex == 8)
+                    { // Rhythm mechanic
+                        _conductor.SetActive(true);
+                        _beatBar.SetActive(true);
+                    }
                 }
             }
 
@@ -85,6 +103,14 @@ public class TutorialManager : MonoBehaviour
                         _arrowGUI.SetActive(false);
                     }
 
+                    if (currentDialogueIndex == 10)
+                    {
+                        _loadFirstLevel.SetActive(true);
+                        InputManager.Instance.EnableUIInput();
+                        Cursor.lockState = CursorLockMode.None;
+                        Cursor.visible = true;
+                    }
+
                     if (currentDialogueIndex < dialogues.Length - 1)
                     {
                         currentDialogueIndex++;
@@ -97,5 +123,16 @@ public class TutorialManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void CloseLoadLevelConfirm() {
+        _loadFirstLevel.SetActive(false);
+        InputManager.Instance.EnablePlayerInput();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    public void LoadFirstLevel() {
+        GameManager.Instance.LoadFirstLevel();
     }
 }

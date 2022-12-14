@@ -23,9 +23,13 @@ public class PlayerMovementCC : MonoBehaviour
     private Camera m_playerCam;
     private CharacterController m_player;
     private CharacterCamera m_characterCamera;
-
     [SerializeField] private Conductor m_conductor;
     private PlayerCheckpoint _playerCheckpoint = new PlayerCheckpoint();
+
+    [Header("Audio")]
+    private AudioSource m_playerFX;
+    private AudioClip stepLanding;
+
 
     [Header("Movement")]
     private Vector3 finalVelocity = Vector3.zero;
@@ -33,6 +37,7 @@ public class PlayerMovementCC : MonoBehaviour
     [SerializeField] private float gravity;
     [SerializeField] private float friction;
     [SerializeField] private float airControl;
+    [SerializeField] private bool onAir;
 
     [SerializeField] private MovementSettings m_GroundSettings = new MovementSettings(7, 14, 18);
     [SerializeField] private MovementSettings m_AirSettings = new MovementSettings(7, 8, 5);
@@ -47,7 +52,7 @@ public class PlayerMovementCC : MonoBehaviour
 
     [Header("Checkpoint")]
     [SerializeField] private bool loadingCheckpoint;
-    [SerializeField] private bool checkPosition;
+    [SerializeField] private float checkpointLoadTimer;
 
     private void Awake()
     {
@@ -55,12 +60,34 @@ public class PlayerMovementCC : MonoBehaviour
         m_characterCamera = this.GetComponent<CharacterCamera>();
         m_playerCam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         m_conductor = GameObject.FindGameObjectWithTag("Conductor").GetComponent<Conductor>();
+        m_playerFX = GetComponentInChildren<AudioSource>();
+        stepLanding = AudioManager.Instance.GetStepLanding();
     }
 
     // Use this for initialization
     private void Start()
     {
         jumpQueued = false;
+        onAir = false;
+
+        m_playerFX.volume = AudioManager.Instance.GetFXVolume();
+
+        GameManager.Difficulty difficulty = GameManager.Instance.GetDifficulty();
+
+        switch (difficulty)
+        {
+            case GameManager.Difficulty.EASY:
+                validateJump_offsetY = 2f;
+                break;
+            case GameManager.Difficulty.MEDIUM:
+                validateJump_offsetY = 0.5f;
+                break;
+            case GameManager.Difficulty.HARD:
+                validateJump_offsetY = 0.1f;
+                break;
+            default:
+                break;
+        }
 
         //m_mouseLook.Init(transform, playerCam.transform);
     }
@@ -72,7 +99,14 @@ public class PlayerMovementCC : MonoBehaviour
 
         if (loadingCheckpoint)
         {
-            checkPosition = true;
+            checkpointLoadTimer -= Time.deltaTime;
+            if (checkpointLoadTimer <= 0) 
+            {
+                checkpointLoadTimer = 1f;
+                Debug.Log("Checkpoint Loaded");
+                loadingCheckpoint = false;
+                m_characterCamera.SetCanRotate(true);
+            }
             return;
         }
 
@@ -98,8 +132,9 @@ public class PlayerMovementCC : MonoBehaviour
 
         if (m_player.isGrounded)
         {
+
             // Jump
-            if (InputManager.Instance.GetJumpButtonDown() || jumpQueued)
+            if (InputManager.Instance.GetJumpButtonDown() || InputManager.Instance.GetMouseScrollMagnitude() != 0 || jumpQueued)
             {
                 if (m_conductor.GetBeatOnHit())
                 {
@@ -115,9 +150,17 @@ public class PlayerMovementCC : MonoBehaviour
             {
                 GroundMovement(inputMovement);
             }
+
+            if (onAir)
+            {
+                //Debug.Log("Aterriza");
+                m_playerFX.PlayOneShot(stepLanding);
+                onAir = false;
+            }
         }
         else
         {
+            onAir = true;
             AirMovement(inputMovement);
             JumpQueue();
         }
@@ -140,15 +183,19 @@ public class PlayerMovementCC : MonoBehaviour
         if (InputManager.Instance.GetCheckpointSaveButtonDown())
         {
             Debug.Log("Checkpoint");
-            _playerCheckpoint.SaveCheckpoint(this.transform.position, this.transform.rotation, m_playerCam.transform.localRotation);
+            _playerCheckpoint.SaveCheckpoint(this.transform.position, this.transform.rotation, m_playerCam.transform.localEulerAngles);
+            Debug.Log("playerCam local rotation: " + m_playerCam.transform.localEulerAngles);
         }
         else if (InputManager.Instance.GetCheckpointLoadButtonDown())
         {
             Debug.Log("Loading Checkpoint");
             loadingCheckpoint = true;
+
+            Vector3 camera_eulerAngles = _playerCheckpoint.GetLastCheckpointCamRotation();
             m_characterCamera.SetCanRotate(false);
-            //finalVelocity = new Vector3(0.01f, -1f, 0.01f);
-            m_playerCam.transform.localRotation = _playerCheckpoint.GetLastCheckpointCamRotation();
+            m_characterCamera.SetRotationXY(camera_eulerAngles.x, camera_eulerAngles.y);
+            finalVelocity = new Vector3(0f, -1f, 0f);
+            m_playerCam.transform.localEulerAngles = camera_eulerAngles;
             this.transform.position = _playerCheckpoint.GetLastCheckpointPosition();
             this.transform.rotation = _playerCheckpoint.GetLastCheckpointRotation();
             //_playerCheckpoint.LoadCheckpoint();
@@ -156,28 +203,13 @@ public class PlayerMovementCC : MonoBehaviour
             //UnityEditor.EditorApplication.isPaused = true;
         }
 
-        /*if (checkPosition)
-        {
-            if (transform.position != _playerCheckpoint.GetLastCheckpointPosition())
-            {
-                Debug.Log("Loading Checkpoint Again");
-                m_playerCam.transform.rotation = _playerCheckpoint.GetLastCheckpointCamRotation();
-                transform.position = _playerCheckpoint.GetLastCheckpointPosition();
-                transform.rotation = _playerCheckpoint.GetLastCheckpointRotation();
-            }
-            else
-            {
-                Debug.Log("Checkpoint Loaded");
-                loadingCheckpoint = false;
-                checkPosition = false;
-                m_characterCamera.SetCanRotate(true);
-            }
-        }*/
-
     }
 
     private void GroundMovement(Vector3 direction) 
     {
+        // Reset gravity velocity
+        finalVelocity.y = /*direction.y * */ -gravity * Time.deltaTime;
+
         // Friction
         if (m_player.isGrounded && !jumpQueued) {
             ApplyFriction(1.0f);
@@ -201,8 +233,6 @@ public class PlayerMovementCC : MonoBehaviour
 
         Accelerate(wishDir, wishSpeed, m_GroundSettings.Acceleration);
 
-        // Reset gravity velocity
-        finalVelocity.y = direction.y * gravity * Time.deltaTime;
     }
 
     private void AirMovement(Vector3 direction)
@@ -281,7 +311,7 @@ public class PlayerMovementCC : MonoBehaviour
         //Vector3 clampedVelocity = Mathf.Clamp(currentVelocity, 0, 250) * transform.forward;
         //currentVelocity = Mathf.Clamp(currentVelocity, 0, 250);
         //Debug.Log("vel z: " + clampedVelocity.z + " vel x: " + clampedVelocity.x + " vel y: " + clampedVelocity.y);
-        Debug.Log("vel z: " + finalVelocity.z + " vel x: " + finalVelocity.x + " vel y: " + finalVelocity.y);
+        //Debug.Log("vel z: " + finalVelocity.z + " vel x: " + finalVelocity.x + " vel y: " + finalVelocity.y);
         //Debug.Log(currentVelocity);
 
         //finalVelocity = new Vector3(clampedVelocity.x, finalVelocity.y, clampedVelocity.z);
@@ -318,12 +348,12 @@ public class PlayerMovementCC : MonoBehaviour
         // Raycasts to calculate ground and validate jump
         Vector3 playerFeet = transform.position + new Vector3(0, -1f, 0);
 
-        if (Physics.Linecast(playerFeet + new Vector3(0.2f, 0, 0), playerFeet + new Vector3(0.2f, validateJump_offsetY, 0)) && InputManager.Instance.GetJumpButtonDown())
+        if (Physics.Linecast(playerFeet + new Vector3(0.2f, 0, 0), playerFeet + new Vector3(0.2f, validateJump_offsetY, 0)) && (InputManager.Instance.GetJumpButtonDown() || InputManager.Instance.GetMouseScrollMagnitude() != 0))
         {
             jumpQueued = true;
         }
 
-        if (Physics.Linecast(playerFeet + new Vector3(-0.2f, 0, 0), playerFeet + new Vector3(-0.2f, validateJump_offsetY, 0)) && InputManager.Instance.GetJumpButtonDown())
+        if (Physics.Linecast(playerFeet + new Vector3(-0.2f, 0, 0), playerFeet + new Vector3(-0.2f, validateJump_offsetY, 0)) && (InputManager.Instance.GetJumpButtonDown() || InputManager.Instance.GetMouseScrollMagnitude() != 0))
         {
             jumpQueued = true;
         }
@@ -341,11 +371,6 @@ public class PlayerMovementCC : MonoBehaviour
     private void OnGUI()
     {
         GUI.TextArea(new Rect(130, 60, 130, 20), "Speed XZ  " + new Vector3(finalVelocity.x, 0, finalVelocity.z).sqrMagnitude.ToString());
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawSphere(_playerCheckpoint.GetLastCheckpointPosition(), 1f);
     }
 
 }

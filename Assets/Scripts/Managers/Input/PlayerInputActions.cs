@@ -80,6 +80,15 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": ""Press"",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MouseScroll"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""70312002-15d6-4d66-94d2-adec9d5c6ff2"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -223,6 +232,17 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Menu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""dd3fce4b-a3ef-48cc-98ec-e76d65a88464"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseScroll"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -755,6 +775,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         m_Character_Checkpoint_Save = m_Character.FindAction("Checkpoint_Save", throwIfNotFound: true);
         m_Character_Checkpoint_Load = m_Character.FindAction("Checkpoint_Load", throwIfNotFound: true);
         m_Character_Menu = m_Character.FindAction("Menu", throwIfNotFound: true);
+        m_Character_MouseScroll = m_Character.FindAction("MouseScroll", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -832,6 +853,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Character_Checkpoint_Save;
     private readonly InputAction m_Character_Checkpoint_Load;
     private readonly InputAction m_Character_Menu;
+    private readonly InputAction m_Character_MouseScroll;
     public struct CharacterActions
     {
         private @PlayerInputActions m_Wrapper;
@@ -842,6 +864,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         public InputAction @Checkpoint_Save => m_Wrapper.m_Character_Checkpoint_Save;
         public InputAction @Checkpoint_Load => m_Wrapper.m_Character_Checkpoint_Load;
         public InputAction @Menu => m_Wrapper.m_Character_Menu;
+        public InputAction @MouseScroll => m_Wrapper.m_Character_MouseScroll;
         public InputActionMap Get() { return m_Wrapper.m_Character; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -869,6 +892,9 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @Menu.started -= m_Wrapper.m_CharacterActionsCallbackInterface.OnMenu;
                 @Menu.performed -= m_Wrapper.m_CharacterActionsCallbackInterface.OnMenu;
                 @Menu.canceled -= m_Wrapper.m_CharacterActionsCallbackInterface.OnMenu;
+                @MouseScroll.started -= m_Wrapper.m_CharacterActionsCallbackInterface.OnMouseScroll;
+                @MouseScroll.performed -= m_Wrapper.m_CharacterActionsCallbackInterface.OnMouseScroll;
+                @MouseScroll.canceled -= m_Wrapper.m_CharacterActionsCallbackInterface.OnMouseScroll;
             }
             m_Wrapper.m_CharacterActionsCallbackInterface = instance;
             if (instance != null)
@@ -891,6 +917,9 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
                 @Menu.started += instance.OnMenu;
                 @Menu.performed += instance.OnMenu;
                 @Menu.canceled += instance.OnMenu;
+                @MouseScroll.started += instance.OnMouseScroll;
+                @MouseScroll.performed += instance.OnMouseScroll;
+                @MouseScroll.canceled += instance.OnMouseScroll;
             }
         }
     }
@@ -1008,6 +1037,7 @@ public partial class @PlayerInputActions : IInputActionCollection2, IDisposable
         void OnCheckpoint_Save(InputAction.CallbackContext context);
         void OnCheckpoint_Load(InputAction.CallbackContext context);
         void OnMenu(InputAction.CallbackContext context);
+        void OnMouseScroll(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

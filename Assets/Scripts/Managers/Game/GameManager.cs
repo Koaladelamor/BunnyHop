@@ -3,6 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    public enum Difficulty { EASY, MEDIUM, HARD }
+    private Difficulty difficulty = Difficulty.EASY;
 
     public static GameManager Instance;
 
@@ -54,6 +56,12 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("FirstLevel");
     }
 
+    public void LoadSecondLevel()
+    {
+        InputManager.Instance.EnablePlayerInput();
+        SceneManager.LoadScene("SecondLevel");
+    }
+
     public void LoadTutorial()
     {
         InputManager.Instance.EnablePlayerInput();
@@ -78,4 +86,13 @@ public class GameManager : MonoBehaviour
     public void SetGamePaused(bool paused) { gamePaused = paused; }
 
     public bool GetGamePaused() { return gamePaused; }
+
+    public Difficulty GetDifficulty() {
+        return difficulty;
+    }
+
+    public void SetDifficulty(Difficulty dif)
+    {
+        difficulty = dif;
+    }
 }
