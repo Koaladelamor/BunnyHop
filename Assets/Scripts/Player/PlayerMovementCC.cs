@@ -139,12 +139,13 @@ public class PlayerMovementCC : MonoBehaviour
                 if (m_conductor.GetBeatOnHit())
                 {
                     onBeatJump = true;
-                    //jumpQueued = false;
-                    //finalVelocity.y = jumpForce * 2f;
-                    Debug.Log("SUPER JUMP");
+                    finalVelocity.y = jumpForce + 0.1f;
+                    //Debug.Log("SUPER JUMP");
+                }
+                else {
+                    finalVelocity.y = jumpForce;
                 }
                 jumpQueued = false;
-                finalVelocity.y = jumpForce;
             }
             else 
             {
@@ -287,11 +288,11 @@ public class PlayerMovementCC : MonoBehaviour
         velocity.y = 0;
         float currentVelocity = velocity.sqrMagnitude;
         float modifier = 1;
-        if (currentVelocity > 50 && currentVelocity < 125) { modifier = 0.85f; }
-        else if (currentVelocity >= 125 && currentVelocity < 200) { modifier = 0.65f; }
-        else if (currentVelocity >= 200 && currentVelocity < 250) { modifier = 0.45f; }
-        else if (currentVelocity >= 250 && currentVelocity < 300) { modifier = 0.3f; }
-        else if (currentVelocity >= 300) { modifier = 0.05f; }
+        if (currentVelocity > 50 && currentVelocity < 100) { modifier = 0.85f; }
+        else if (currentVelocity >= 100 && currentVelocity < 150) { modifier = 0.65f; }
+        else if (currentVelocity >= 150 && currentVelocity < 200) { modifier = 0.45f; }
+        else if (currentVelocity >= 200 && currentVelocity < 250) { modifier = 0.3f; }
+        else if (currentVelocity >= 250) { modifier = 0.1f; }
 
         float accelspeed = acceleration * Time.deltaTime * targetSpeed * modifier;
         //Debug.Log("addspeed : " + addspeed);
